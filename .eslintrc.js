@@ -1,0 +1,6 @@
+[
+  "error",
+  {
+    "endOfLine": "auto"
+  },
+]
