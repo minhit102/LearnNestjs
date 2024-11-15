@@ -12,13 +12,13 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath : '.env'
     }),
     MongooseModule.forRoot('mongodb://localhost:27017/nestdata'),
     UsersModule,
     ProductsModule,
     OrdersModule,
     AuthModule,
-
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -3,10 +3,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Response } from 'express';
 import { User, UserDocument } from './schemas/user.schema';
 import {  BadRequestException, InternalServerErrorException } from '@nestjs/common';
-import { stringify } from 'querystring';
 
 
 @Injectable()
@@ -17,15 +15,14 @@ export class UsersService {
   ) {}
 
 
-  async create(user: Partial<UserDocument>): Promise<UserDocument> {
+  async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     try {
-      const findUser = await this.userModel.findOne({ email: user.email });
+      const findUser = await this.userModel.findOne({ email: createUserDto.email });
       if (findUser) {
         throw new BadRequestException('Email already exists');
       }
-
-      const createdUser = await this.userModel.create(user);
-      return createdUser;
+      const newUser = await this.userModel.create(createUserDto);
+      return newUser;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
