@@ -2,11 +2,14 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UsersModule } from 'src/users/users.module';
-import { AuthGuard } from './auth.guard';
+
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/users/schemas/user.schema';
+import { jwtConstants } from './constants';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './jwt.strategy';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -19,14 +22,15 @@ import { User, UserSchema } from 'src/users/schemas/user.schema';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
+        secret: jwtConstants.secret,
         signOptions: { expiresIn: '20m' },
       }), 
     }),
+    PassportModule
   ],
-  providers: [AuthService , AuthGuard ],
+  providers: [AuthService,JwtStrategy],
   controllers: [AuthController],
-  exports: [AuthService, AuthGuard,JwtModule ],
+  exports: [AuthService,JwtModule ],
 })
 
 export class AuthModule {}

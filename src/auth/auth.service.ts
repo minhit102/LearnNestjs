@@ -35,12 +35,15 @@ export class AuthService {
     };
   }
 
-  async validateUser(payload: any) {
-    const user = await this.userModel.findById(payload.id);
+  async validateUser(email : string , password : string) {
+    const user = await this.userModel.findOne({email : email});
+    if(user?.password !== password ){
+      return false;
+    }
     return user;
   }
   async getProfileUser(id : string ){
-    const user = await await this.userModel.findById(id);
+    const user =  await this.userModel.findById(id);
     return user
   }
 }
