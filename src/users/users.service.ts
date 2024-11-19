@@ -5,6 +5,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 import {  BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { GetUserParamsDto } from 'src/common/dto/pagination.dto';
 
 
 @Injectable()
@@ -46,6 +47,40 @@ export class UsersService {
       }
       throw new InternalServerErrorException(`User creation failed: ${error.message}`);
     }
+  }
+
+  async getListUser(params : GetUserParamsDto){
+    
+    const limit = parseInt(params.limit) || 1;
+    const page = parseInt(params.page) || 10;
+    const sortBy = params.sortBy || 'createdAt';
+    const order = params.order === 'asc'? 1 : -1 ;
+
+    const total = await this.userModel.countDocuments();
+    const totalPage = Math.floor(total / limit) + 1;
+    
+    const skip  = limit * (page-1);
+    //const user = await this.userModel.
+    const users = await this.userModel
+    .find()
+    .sort({[sortBy] : order})
+    .skip(skip)
+    .limit(limit)
+    .select("_id username email address role updateAt")
+
+    return {
+      total : total,
+      limit : limit , 
+      page : page,
+      sortBy : sortBy,
+      order : order,
+      totalPage : totalPage,
+      users : users
+    }
+  }
+
+  async findUserByKeys(content  : string){
+    const user = await this.userModel.find()
   }
 
   async findOne(id: string) {
@@ -104,7 +139,6 @@ export class UsersService {
       throw new InternalServerErrorException(`User find failed: ${error.message}`);
     }
   }
-
   async remove(id: string) {
     try {
       const findUser = await this.userModel.findById(id);

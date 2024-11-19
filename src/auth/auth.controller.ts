@@ -2,6 +2,9 @@ import { Body, Controller, Post, HttpCode, HttpStatus ,UseGuards, Get ,Request} 
 import { AuthService } from './auth.service';
 import {JwtAuthGuard} from './auth.guard';
 import { JwtStrategy } from './jwt.strategy';
+import { Roles } from './roles.decorator';
+import { Role } from './role.enum';
+import { RolesGuard } from './roles.guard';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -13,7 +16,8 @@ export class AuthController {
   }
   
   
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard,RolesGuard)
+  @Roles(Role.User)
   @Get('profile')
   getProfile(@Request() req) {
     return  this.authService.getProfileUser(req.user.id)
