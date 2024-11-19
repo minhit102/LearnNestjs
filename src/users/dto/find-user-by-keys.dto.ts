@@ -1,3 +1,6 @@
+import { IsOptional } from "class-validator";
+
 export class FindUserByKeysDto {
-    key: string;
+  @IsOptional() 
+  key: string;
   }

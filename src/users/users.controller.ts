@@ -39,10 +39,10 @@ export class UsersController {
   getListUser(@Query() params : GetUserParamsDto){
     return this.usersService.getListUser(params)
   }
-  // @Get('find-user-by-keys')
-  // getUserByKeys(@Body() content : FindUserByKeysDto ){
-  //   return this.usersService.findUserByKeys()
-  // }
+  @Get('search')
+  getUserByKeys(@Query('keys') keys : string ){
+    return this.usersService.findUserByKeys(keys)
+  }
 
 
   @Get(':id')

@@ -6,6 +6,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 import {  BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { GetUserParamsDto } from 'src/common/dto/pagination.dto';
+import { FindUserByKeysDto } from './dto/find-user-by-keys.dto';
 
 
 @Injectable()
@@ -79,8 +80,19 @@ export class UsersService {
     }
   }
 
-  async findUserByKeys(content  : string){
-    const user = await this.userModel.find()
+  async findUserByKeys(keys : string){
+
+  const regex = new RegExp(keys, 'i'); 
+  console.log(keys)
+
+  const users = await this.userModel.find({
+    $or: [
+      { username: { $regex: regex } },  
+      { address: { $regex: regex } },
+      { email: { $regex: regex } },
+    ],
+  });
+    return users
   }
 
   async findOne(id: string) {
