@@ -1,5 +1,8 @@
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+
+import * as bcrypt from 'bcrypt';
+
 import {
   Injectable,
   UnauthorizedException,
@@ -17,8 +20,9 @@ export class AuthService {
     user : string,
     access_token: string }> {
       const user = await this.userModel.findOne({email : email})
+      const isMatch = await bcrypt.compare( pass, user?.password);
     //const user = await this.usersService.findByEmail(email);
-    if (user?.password != pass) {
+    if (!isMatch) {
       throw new UnauthorizedException();
     }
     const payload = {
