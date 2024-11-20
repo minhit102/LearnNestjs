@@ -5,16 +5,22 @@ import * as bcrypt from 'bcrypt';
 
 import {
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/schemas/user.schema';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { OtpService } from './otp.service';
+import { EmailService } from './email.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
     @InjectModel(User.name) private userModel: Model<User>,
+    private otpService : OtpService,
+    private emailService : EmailService,
   ) {}
   async signIn(email: string, pass: string): Promise<{ 
     user : string,
@@ -49,5 +55,18 @@ export class AuthService {
   async getProfileUser(id : string ){
     const user =  await this.userModel.findById(id);
     return user
+  }
+
+  async forgotPassword(forgotPasswordDto : ForgotPasswordDto){
+    const findUser = await this.userModel.findOne({email : forgotPasswordDto.email})
+
+    if(!findUser){
+      throw new NotFoundException(`User with ${forgotPasswordDto.email} not exits`)
+    }
+    const otp = await this.otpService.generateAndSaveOTP(findUser._id);
+    await this.emailService.sendOtpEmail(findUser.email, otp);
+    return { 
+      message: 'OTP has been sent to your email.',
+     };
   }
 }

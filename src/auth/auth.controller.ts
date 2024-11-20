@@ -5,6 +5,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { Roles } from './roles.decorator';
 import { Role } from './role.enum';
 import { RolesGuard } from './roles.guard';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -22,7 +23,11 @@ export class AuthController {
   getProfile(@Request() req) {
     return  this.authService.getProfileUser(req.user.id)
     //return req.user;
-    
+  }
+
+  @Post('forgot-password')
+  resetPassword(@Body() forgotPasswordDto :  ForgotPasswordDto){
+    return  this.authService.forgotPassword(forgotPasswordDto);
   }
 
 }
