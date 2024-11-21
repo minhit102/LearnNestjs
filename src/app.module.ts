@@ -8,9 +8,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './auth/roles.guard';
+import { BullModule } from '@nestjs/bull';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
+    
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -19,6 +22,7 @@ import { RolesGuard } from './auth/roles.guard';
     UsersModule,
     OrdersModule,
     AuthModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [

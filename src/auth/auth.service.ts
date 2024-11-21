@@ -12,15 +12,16 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/schemas/user.schema';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { OtpService } from './otp.service';
-import { EmailService } from './email.service';
+import { Queue } from 'bull';
+import { InjectQueue } from '@nestjs/bull';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
+    @InjectQueue('email') private readonly emailQueue: Queue,
     @InjectModel(User.name) private userModel: Model<User>,
     private otpService : OtpService,
-    private emailService : EmailService,
   ) {}
   async signIn(email: string, pass: string): Promise<{ 
     user : string,
@@ -64,7 +65,12 @@ export class AuthService {
       throw new NotFoundException(`User with ${forgotPasswordDto.email} not exits`)
     }
     const otp = await this.otpService.generateAndSaveOTP(findUser._id);
-    await this.emailService.sendOtpEmail(findUser.email, otp);
+    const data = {
+      email : findUser.email,
+      otp : otp
+    }
+    console.log(data)
+    await this.emailQueue.add('send',data);
     return { 
       message: 'OTP has been sent to your email.',
      };

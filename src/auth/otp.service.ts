@@ -12,7 +12,7 @@ export class OtpService {
   async generateAndSaveOTP(user_id: Object): Promise<string> {
     const otp = randomInt(100000, 999999).toString(); 
     const expiresAt = new Date();
-    expiresAt.setMinutes(expiresAt.getMinutes() + 2); 
+    expiresAt.setMinutes(expiresAt.getMinutes() + 2);
     const newOtp = this.otpModel.create({ user_id, otp, expiresAt });
     return otp;
   }
